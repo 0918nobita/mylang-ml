@@ -11,5 +11,5 @@ implemented in OCaml
 ```bash
 dotnet fsi build.fsx # generates build.ninja
 ninja
-./main
+./build/main
 ```

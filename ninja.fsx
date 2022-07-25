@@ -39,14 +39,32 @@ type BuildStmt =
         explicitOutputs: list<string> *
         implicitOutputs: list<string> *
         rulename: string *
-        inputs: list<string>
+        explicitInputs: list<string> *
+        implicitInputs: list<string>
 
     override this.ToString() =
-        let (BuildStmt (explicitOutputs, implicitOutputs, rulename, inputs)) = this
+        let (BuildStmt (explicitOutputs, implicitOutputs, rulename, explicitInputs, implicitInputs)) =
+            this
+
         let explicitOutputs = String.concat "" explicitOutputs
-        let implicitOutputs = String.concat " " implicitOutputs
-        let inputs = String.concat " " inputs
-        $"build %s{explicitOutputs} | %s{implicitOutputs}: %s{rulename} %s{inputs}"
+
+        let implicitOutputs =
+            (if List.isEmpty implicitOutputs then
+                 ""
+             else
+                 " | ")
+            + String.concat " " implicitOutputs
+
+        let explicitInputs = String.concat " " explicitInputs
+
+        let implicitInputs =
+            (if List.isEmpty implicitInputs then
+                 ""
+             else
+                 " | ")
+            + String.concat " " implicitInputs
+
+        $"build %s{explicitOutputs}%s{implicitOutputs}: %s{rulename} %s{explicitInputs}%s{implicitInputs}"
 
 type BuildFileContent =
     | BuildFileContent of varDecls: list<VarDecl> * ruleBlocks: list<RuleBlock> * buildStmts: list<BuildStmt>
@@ -82,13 +100,14 @@ let rule
 
 let mutable buildStmts = List.empty<BuildStmt>
 
-let build explicitOutputs implicitOutputs rulename inputs =
+let build explicitOutputs implicitOutputs rulename explicitInputs implicitInputs =
     buildStmts <-
         BuildStmt(
             explicitOutputs = explicitOutputs,
             implicitOutputs = implicitOutputs,
             rulename = rulename,
-            inputs = inputs
+            explicitInputs = explicitInputs,
+            implicitInputs = implicitInputs
         )
         :: buildStmts
 

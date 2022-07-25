@@ -2,7 +2,7 @@
 
 Ninja.rule
     "compile"
-    {| command = "ocamlopt -c $in -I ."
+    {| command = "ocamlopt -c $in -o $out -I ./build"
        depfile = None
        deps = None |}
 
@@ -17,23 +17,39 @@ let addModule
                  hasSignature: bool
                  dependencies: list<string> |})
     =
+    if modInfo.hasSignature then
+        Ninja.build
+            [ $"build/{modInfo.name}.cmi" ]
+            []
+            "compile"
+            [ $"{modInfo.name}.mli" ]
+            (modInfo.dependencies
+             |> List.map (fun name -> $"build/{name}.cmi"))
+
+    let explicitOutputs = [ $"build/{modInfo.name}.cmx" ]
+
     let implicitOutputs =
-        [ $"{modInfo.name}.cmx"
-          $"{modInfo.name}.cmi"
-          $"{modInfo.name}.o" ]
-
-    let inputs =
-        (modInfo.dependencies
-         |> List.map (sprintf "%s.cmx"))
+        [ $"build/{modInfo.name}.o" ]
         @ (if modInfo.hasSignature then
-               [ $"{modInfo.name}.mli"
-                 $"{modInfo.name}.ml" ]
+               []
            else
-               [ $"{modInfo.name}.ml" ])
+               [ $"build/{modInfo.name}.cmi" ])
 
-    Ninja.build [] implicitOutputs "compile" inputs
+    let explicitInputs = [ $"{modInfo.name}.ml" ]
+
+    let implicitInputs =
+        (modInfo.dependencies
+         |> List.collect (fun modName ->
+             [ $"build/{modName}.cmi"
+               $"build/{modName}.cmx" ]))
+        @ if modInfo.hasSignature then
+              [ $"build/{modInfo.name}.cmi" ]
+          else
+              []
+
+    Ninja.build explicitOutputs implicitOutputs "compile" explicitInputs implicitInputs
 
 let executable exePath modNames =
-    Ninja.build [ exePath ] [] "link" (modNames |> List.map (sprintf "%s.cmx"))
+    Ninja.build [ $"build/{exePath}" ] [] "link" (modNames |> List.map (sprintf "build/%s.cmx")) []
 
-let generate = Ninja.generate
+let build () = Ninja.generate "build.ninja"

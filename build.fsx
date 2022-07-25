@@ -12,4 +12,4 @@ Ocaml.addModule
 
 Ocaml.executable "main" [ "expression"; "main" ]
 
-Ocaml.generate "build.ninja"
+Ocaml.build ()

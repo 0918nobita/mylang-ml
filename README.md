@@ -8,6 +8,7 @@ implemented in OCaml
 - ``ninja``
 
 ```bash
+dotnet fsi build.fsx # generates build.ninja
 ninja
 ./main
 ```

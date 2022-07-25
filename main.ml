@@ -1,9 +1,25 @@
-type expression =
-  | IntLiteral of int
-  | Plus of expression * expression
-  | Times of expression * expression
+module Expression : sig
+  type t
 
-module Expression = struct
+  val int_literal : int -> t
+
+  val plus : t -> t -> t
+
+  val times : t -> t -> t
+
+  val to_string : t -> string
+end = struct
+  type t =
+    | IntLiteral of int
+    | Plus of t * t
+    | Times of t * t
+
+  let int_literal i = IntLiteral i
+  
+  let plus lhs rhs = Plus (lhs, rhs)
+
+  let times lhs rhs = Times (lhs, rhs)
+
   let is_literal = function
     | IntLiteral _ -> true
     | _ -> false
@@ -24,4 +40,5 @@ module Expression = struct
       end
 end
 
-let () = print_endline @@ Expression.to_string (Plus (Plus (IntLiteral 1, IntLiteral 2), IntLiteral 4))
+let () =
+  print_endline @@ let open Expression in to_string @@ plus (plus (int_literal 1) (int_literal 2)) (int_literal 4)

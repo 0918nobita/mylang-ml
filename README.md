@@ -4,8 +4,9 @@ implemented in OCaml
 
 ## Requirements
 
-- ``ocamlopt``
+- ``dotnet fsi`` (included in .NET SDK)
 - ``ninja``
+- ``ocamlopt``
 
 ```bash
 dotnet fsi build.fsx # generates build.ninja

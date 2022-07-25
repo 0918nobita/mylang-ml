@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "src/**/*.cmi": true,
+        "src/**/*.cmt": true,
+        "src/**/*.cmti": true,
+        "src/**/*.cmx": true,
+        "src/**/*.o": true,
+    }
+}

@@ -4,7 +4,7 @@ type t =
     | Times of t * t
 
 let int_literal i = IntLiteral i
-  
+
 let plus lhs rhs = Plus (lhs, rhs)
 
 let times lhs rhs = Times (lhs, rhs)

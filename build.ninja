@@ -1,4 +1,11 @@
 rule compile
+    command = ocamlopt -c $in -I .
+
+rule link
     command = ocamlopt -o $out $in
 
-build main: compile main.ml
+build | expression.cmx expression.cmi expression.o: compile expression.mli expression.ml
+
+build | main.cmx main.cmi main.o: compile expression.cmx main.ml
+
+build main: link expression.cmx main.cmx
